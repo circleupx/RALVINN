@@ -33,6 +33,7 @@
         K - Camera Down
         I - Toggle Lights
         R - Neural Network
+        Space bar - Take a pic
     8) Enjoy, have fun and help us by improving the code.
 
 
@@ -42,5 +43,5 @@
     1) The Neural Network is set to 50 neurons
     2) The current frame rate is 10 FPS, max is 48
     3) Each tread is set to full speed [1,1]
-    4) Take a picture is currently disabled.
+    4) All picutes taken are saved under folder /RALVINN.
     5) Rover 2.0 has a mic and speakers.
