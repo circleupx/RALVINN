@@ -19,7 +19,7 @@
 #######################################################
 # ------------------------------------------------------#
 
-from roverBrain import *
+from Brain import *
 
 if __name__ == '__main__':
-    brain = roverBrain()
+    brain = Brain()

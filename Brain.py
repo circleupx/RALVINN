@@ -20,36 +20,40 @@
 
 from roverShell import *
 import numpy as np
-import scipy.io as sio
+from pygame.locals import *
+from time import sleep
+from datetime import date
+from random import choice
+from string import ascii_lowercase, ascii_uppercase
 
 
-class roverBrain():
+class Brain:
     def __init__(self):
         pygame.init()
         pygame.display.init()
 
         self.quit = False
         self.rover = roverShell()
-        self.fps = 10  # Camera Frame Rate
-        self.windowSize = [840, 380]
-        self.imageRect = (0, 0, 320, 240)
-        self.displayCaption = "Machine Perception and Cognitive Robotics RALVINN"
+        self.fps = 48  # Camera Frame Rate
+        self.windowSize = [740, 280]
+        self.imageRect = (0, 0, 320, 280)
+        self.displayCaption = "Machine Perception and Cognitive Robotics"
 
         pygame.display.set_caption(self.displayCaption)
 
-        self.screen = pygame.display.set_mode(self.windowSize)
+        self.screen = pygame.display.set_mode(self.windowSize, HWSURFACE | DOUBLEBUF | RESIZABLE)
         self.clock = pygame.time.Clock()
         self.run()
 
     def run(self):
         sleep(1.5)
         while not self.quit:
-            self.parseControls()
-            self.refreshVideo()
+            self.update_rover_state()
+            self.update_image_from_video_feed()
         self.rover.quit = True
         pygame.quit()
 
-    def blitscale(self, x):
+    def blit_scale(self, x):
         np.seterr(divide = 'ignore', invalid = 'ignore')
         x -= np.min(x)
         x = x / np.linalg.norm(x)
@@ -57,7 +61,7 @@ class roverBrain():
 
         return x
 
-    def refreshVideo(self):
+    def update_image_from_video_feed(self):
 
         self.rover.lock.acquire()
         image = self.rover.currentImage
@@ -76,13 +80,13 @@ class roverBrain():
 
         for k in range(min(7, self.rover.number_of_neurons)):
             imagew11 = pygame.surfarray.make_surface(
-                np.reshape(self.blitscale(self.rover.network_weight_one[:-1, k]), (32, 24, 3)))
+                np.reshape(self.blit_scale(self.rover.network_weight_one[:-1, k]), (32, 24, 3)))
             self.screen.blit(imagew11, (500 + 40 * k, 0))
             pygame.display.update((500 + 40 * k, 0, 32, 24))
 
         for k in range(min(7, self.rover.number_of_neurons)):
             imagedw11 = pygame.surfarray.make_surface(
-                np.reshape(self.blitscale(self.rover.dw1[:-1, k]), (32, 24, 3)))
+                np.reshape(self.blit_scale(self.rover.dw1[:-1, k]), (32, 24, 3)))
             self.screen.blit(imagedw11, (500 + 40 * k, 50))
             pygame.display.update((500 + 40 * k, 50, 32, 24))
 
@@ -91,7 +95,7 @@ class roverBrain():
 
         self.clock.tick(self.fps)
 
-    def parseControls(self):
+    def update_rover_state(self):
         for event in pygame.event.get():
             if event.type == QUIT:
                 self.quit = True
@@ -99,12 +103,12 @@ class roverBrain():
                 if event.key in (K_j, K_k, K_SPACE, K_u, K_i, K_o):
                     self.updatePeripherals(event.key)
                 elif event.key in (K_w, K_a, K_s, K_d, K_q, K_e, K_z, K_c, K_r, K_l):
-                    self.updateTreads(event.key)
+                    self.update_wheel_movement(event.key)
                 else:
                     pass
             elif event.type == KEYUP:
                 if event.key in (K_w, K_a, K_s, K_d, K_q, K_e, K_z, K_c, K_r, K_l):
-                    self.updateTreads()
+                    self.update_wheel_movement()
                 elif event.key in (K_j, K_k):
                     self.updatePeripherals()
                 else:
@@ -112,20 +116,20 @@ class roverBrain():
             else:
                 pass
 
-    def takepicure(self):
-        with open(self.newpicturename, 'w') as pic:
+    def take_picture(self):
+        with open(self.new_picture_name, 'w') as pic:
             self.rover.lock.acquire()
             pic.write(self.rover.currentImage)
             self.rover.lock.release()
 
     @property
-    def newpicturename(self):
-        todaysDate = str(date.today())
-        uniquekey = ''.join(choice(ascii_lowercase + ascii_uppercase))
+    def new_picture_name(self):
+        current_date = str(date.today())
+        unique_key = ''.join(choice(ascii_lowercase + ascii_uppercase))
         for _ in range(4):
-            return todaysDate + '_' + uniquekey + '.jpq'
+            return current_date + '_' + unique_key + '.jpq'
 
-    def updateTreads(self, key=None):
+    def update_wheel_movement(self, key=None):
 
         # tread speed ranges from 0 (none) to one (full speed) so [.5 ,.5] would be half full speed
         if key is None:
@@ -171,6 +175,6 @@ class roverBrain():
             self.rover.peripherals['detect'] = not \
                 self.rover.peripherals['detect']
         elif key is K_SPACE:
-            self.takepicure()
+            self.take_picture()
         else:
             pass

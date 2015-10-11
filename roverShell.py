@@ -19,14 +19,8 @@
 ########################################################
 
 import pygame
-from pygame.locals import *
-from time import sleep
-from datetime import date
-from random import choice
-from string import ascii_lowercase, ascii_uppercase
 import threading
 import cStringIO
-import numpy as np
 from scipy.misc import imresize
 from scipy import ndimage as ndi
 from af import *
@@ -68,6 +62,13 @@ class roverShell(Rover20):
         self.network_learning_rate_two = 0.01
         # Network Momemtum Value
         self.M = .5
+
+        self.currentImage = None
+        self.act1 = None
+        self.act2 = None
+        self.act22 = None
+        self.bias = None
+        self.pattern = None
 
     # main loop
     def processVideo(self, jpegbytes, timestamp_10msec):
@@ -114,7 +115,7 @@ class roverShell(Rover20):
 
             self.nn_treads = self.action_vectors_motor[np.argmax(np.sum(self.act22, axis=0))]
 
-            print self.nn_treads
+            print (self.nn_treads)
 
             if np.sum(np.abs(self.treads)):
 
