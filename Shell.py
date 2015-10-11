@@ -65,28 +65,43 @@ class Shell(Rover20):
         self.M = .5
 
         self.currentImage = None
+
         self.act1 = None
+
         self.act2 = None
+
         self.act22 = None
+
         self.bias = None
+
         self.pattern = None
+
+        self.delta_w1 = None
+
+        self.delta_w2 = None
+
+        self.category = None
+
+        self.sse = None
+
+        self.error = None
 
     # main loop
     def processVideo(self, jpegbytes, timestamp_10msec):
         self.lock.acquire()
         if self.peripherals['detect']:
-            self.processImage(jpegbytes)
+            self.process_image_from_rover(jpegbytes)
             self.currentImage = jpegbytes
         else:
             self.currentImage = jpegbytes
         self.lock.release()
         self.setTreads(self.treads[0], self.treads[1])
-        self.setperipherals()
+        self.update_rover_peripherals()
         if self.quit:
             self.close()
 
     # openCV operations
-    def processImage(self, jpegbytes):
+    def process_image_from_rover(self, jpegbytes):
         try:
             self.currentImage = imresize(
                 pygame.surfarray.array3d(pygame.image.load(cStringIO.StringIO(jpegbytes), 'tmp.jpg').convert()),
@@ -98,7 +113,7 @@ class Shell(Rover20):
 
             self.pattern = np.tile(np.reshape(self.currentImage, (32 * 24 * 3)), (64, 1))
 
-            self.pattern = self.pattern + 0.001 * (1 - np.random.random((self.pattern.shape[0], self.pattern.shape[1])))
+            self.pattern += 0.001 * (1 - np.random.random((self.pattern.shape[0], self.pattern.shape[1])))
 
             self.bias = np.ones((self.pattern.shape[0], 1))
 
@@ -152,8 +167,9 @@ class Shell(Rover20):
         except:
             pass
 
+
     # camera features
-    def setperipherals(self):
+    def update_rover_peripherals(self):
         if self.peripherals['lights']:
             self.turnLightsOn()
         else:
