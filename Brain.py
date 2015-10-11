@@ -18,7 +18,7 @@
 # ------------------------------------------------------#
 ########################################################
 
-from roverShell import *
+from Shell import *
 import numpy as np
 from pygame.locals import *
 from time import sleep
@@ -33,7 +33,7 @@ class Brain:
         pygame.display.init()
 
         self.quit = False
-        self.rover = roverShell()
+        self.rover = Shell()
         self.fps = 48  # Camera Frame Rate
         self.windowSize = [740, 280]
         self.imageRect = (0, 0, 320, 280)

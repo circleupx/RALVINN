@@ -27,7 +27,8 @@ from af import *
 
 from rover import Rover20
 
-class roverShell(Rover20):
+
+class Shell(Rover20):
     def __init__(self):
         Rover20.__init__(self)
         self.quit = False
@@ -142,10 +143,10 @@ class roverShell(Rover20):
                 self.network_weight_one = self.network_weight_one + self.dw1
                 self.network_weight_two = self.network_weight_two + self.dw2
 
-                self.network_weight_one = self.network_weight_one + 0.0001 * (
+                self.network_weight_one += 0.0001 * (
                     -0.5 + np.random.random(
                         (self.network_weight_one.shape[0], self.network_weight_one.shape[1])))  # increase random Value
-                self.network_weight_two = self.network_weight_two + 0.0001 * (
+                self.network_weight_two += 0.0001 * (
                     -0.5 + np.random.random(
                         (self.network_weight_two.shape[0], self.network_weight_two.shape[1])))  # increase random Value
         except:
