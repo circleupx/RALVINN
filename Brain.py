@@ -69,9 +69,9 @@ class Brain:
 
         image = pygame.image.load(cStringIO.StringIO(image), 'tmp.jpg').convert()
 
-        image_array = pygame.surfarray.array3d(image)
-        image_array = imresize(image_array, (32, 24))
-        image10 = pygame.surfarray.make_surface(image_array)
+        imagearray = pygame.surfarray.array3d(image)
+        imagearray = imresize(imagearray, (32, 24))
+        image10 = pygame.surfarray.make_surface(imagearray)
 
         self.screen.blit(image10, (400, 0))
         pygame.display.update((400, 0, 32, 24))
